@@ -1,0 +1,48 @@
+---
+- name: Cloner ou mettre à jour le portfolio
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_dir }}"
+    version: "{{ app_version }}"
+    update: true
+    accept_hostkey: true
+  register: app_checkout
+
+- name: Vérifier la présence des dépendances Node.js
+  ansible.builtin.stat:
+    path: "{{ app_dir }}/{{ app_subdir }}/node_modules"
+  register: app_node_modules
+
+- name: Installer les dépendances Node.js
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.command:
+    cmd: npm ci
+    chdir: "{{ app_dir }}/{{ app_subdir }}"
+  when: app_checkout.changed or not app_node_modules.stat.exists
+  register: app_npm_install
+
+- name: Vérifier la présence du build Next.js
+  ansible.builtin.stat:
+    path: "{{ app_dir }}/{{ app_subdir }}/.next/BUILD_ID"
+  register: app_build
+
+- name: Construire l'application Next.js
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.command:
+    cmd: npm run build
+    chdir: "{{ app_dir }}/{{ app_subdir }}"
+  when: app_checkout.changed or app_npm_install.changed or not app_build.stat.exists
+  notify: Redémarrer le portfolio avec PM2
+
+- name: Configurer PM2
+  ansible.builtin.template:
+    src: ecosystem.config.js.j2
+    dest: "{{ app_dir }}/{{ app_subdir }}/ecosystem.config.js"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0644"
+  notify: Redémarrer le portfolio avec PM2

@@ -18,13 +18,13 @@
     group: root
     mode: "0644"
   notify: Recharger Nginx
-
 - name: Activer le site portfolio
   ansible.builtin.file:
     src: /etc/nginx/sites-available/portfolio
     dest: /etc/nginx/sites-enabled/portfolio
     state: link
   notify: Recharger Nginx
+  when: not ansible_check_mode
 
 - name: Désactiver le site par défaut
   ansible.builtin.file:
@@ -36,9 +36,9 @@
   ansible.builtin.command:
     cmd: nginx -t
   changed_when: false
-
 - name: Activer et démarrer Nginx
   ansible.builtin.service:
     name: nginx
     state: started
     enabled: true
+  when: not ansible_check_mode
