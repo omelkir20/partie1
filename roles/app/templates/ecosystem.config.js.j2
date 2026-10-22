@@ -1,0 +1,15 @@
+module.exports = {
+  apps: [
+    {
+      name: "portfolio",
+      cwd: "{{ app_dir }}",
+      script: "node_modules/next/dist/bin/next",
+      args: "start -p {{ app_port }}",
+      interpreter: "node",
+      autorestart: true,
+      env: {
+        NODE_ENV: "production"
+      }
+    }
+  ]
+};

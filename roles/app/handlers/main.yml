@@ -1,0 +1,10 @@
+---
+# TODO : handler "restart app" (redémarrage du process PM2)
+- name: Redémarrer le portfolio avec PM2
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.command:
+    cmd: pm2 startOrReload ecosystem.config.js --update-env
+    chdir: "{{ app_dir }}"
+  environment:
+    HOME: "/home/{{ deploy_user }}"

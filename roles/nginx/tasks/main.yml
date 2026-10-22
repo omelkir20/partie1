@@ -1,0 +1,44 @@
+---
+# TODO : installer nginx
+# TODO : déployer templates/portfolio.conf.j2 vers /etc/nginx/sites-available/portfolio.conf (notify: reload nginx)
+# TODO : activer le site (lien symbolique dans sites-enabled) et retirer le site "default"
+# TODO : s'assurer que nginx est démarré et activé
+- name: Installer Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Déployer la configuration du portfolio
+  ansible.builtin.template:
+    src: portfolio.conf.j2
+    dest: /etc/nginx/sites-available/portfolio
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Recharger Nginx
+
+- name: Activer le site portfolio
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/portfolio
+    dest: /etc/nginx/sites-enabled/portfolio
+    state: link
+  notify: Recharger Nginx
+
+- name: Désactiver le site par défaut
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Recharger Nginx
+
+- name: Vérifier la configuration Nginx
+  ansible.builtin.command:
+    cmd: nginx -t
+  changed_when: false
+
+- name: Activer et démarrer Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true

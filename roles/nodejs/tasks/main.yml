@@ -1,0 +1,26 @@
+---
+# TODO : ajouter le dépôt NodeSource pour Node.js {{ node_major }}
+# TODO : installer nodejs (ansible.builtin.apt)
+# TODO : installer pm2 globalement (community.general.npm, global: true)
+- name: Télécharger le script de configuration NodeSource
+  ansible.builtin.get_url:
+    url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
+    dest: /tmp/nodesource_setup.sh
+    mode: "0755"
+
+- name: Configurer le dépôt NodeSource
+  ansible.builtin.command:
+    cmd: bash /tmp/nodesource_setup.sh
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Installer Node.js
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Installer PM2 globalement
+  ansible.builtin.command:
+    cmd: npm install -g pm2
+    creates: /usr/bin/pm2

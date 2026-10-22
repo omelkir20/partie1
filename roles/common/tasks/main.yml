@@ -1,0 +1,33 @@
+---
+# TODO : mettre à jour le cache apt (ansible.builtin.apt, update_cache + cache_valid_time)
+# TODO : installer git, curl, build-essential
+# TODO : créer l'utilisateur {{ app_user }} (ansible.builtin.user)
+- name: Mettre à jour le cache apt
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Installer les paquets nécessaires
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+      - build-essential
+      - ca-certificates
+      - gnupg
+    state: present
+
+- name: Créer l'utilisateur de déploiement
+  ansible.builtin.user:
+    name: "{{ deploy_user }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Créer le répertoire de l'application
+  ansible.builtin.file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0755"

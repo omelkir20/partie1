@@ -1,0 +1,9 @@
+---
+# TODO : adapter ces valeurs
+app_repo: "git@github.com:omelkir20/partie1.git"
+app_version: "main"
+app_dir: "/opt/portfolio"
+deploy_user: "deploy"
+app_port: 3000
+nodejs_version: "20"
+server_name: "portfolio.local"

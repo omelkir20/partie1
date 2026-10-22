@@ -1,0 +1,6 @@
+---
+# TODO : handler "reload nginx" (ansible.builtin.service, state: reloaded)
+- name: Recharger Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded

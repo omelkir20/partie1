@@ -1,0 +1,42 @@
+---
+# TODO : cloner {{ app_repo }} (version {{ app_version }}) dans {{ app_dir }} (ansible.builtin.git)
+#        -> enregistrer le résultat (register) pour détecter un changement
+# TODO : npm ci puis npm run build (déclenchés seulement si le code a changé ; pensez à changed_when / when)
+# TODO : démarrer l'application avec PM2 sur le port {{ app_port }}
+# TODO : notify: restart app  (uniquement si le code a changé)
+- name: Cloner ou mettre à jour le portfolio
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_dir }}"
+    version: "{{ app_version }}"
+    update: true
+    accept_hostkey: true
+  register: app_checkout
+  notify: Redémarrer le portfolio avec PM2
+
+- name: Installer les dépendances Node.js
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.command:
+    cmd: npm ci
+    chdir: "{{ app_dir }}"
+  when: app_checkout.changed
+
+- name: Construire l'application Next.js
+  become: true
+  become_user: "{{ deploy_user }}"
+  ansible.builtin.command:
+    cmd: npm run build
+    chdir: "{{ app_dir }}"
+  when: app_checkout.changed
+
+- name: Configurer PM2
+  ansible.builtin.template:
+    src: ecosystem.config.js.j2
+    dest: "{{ app_dir }}/ecosystem.config.js"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0644"
+  notify: Redémarrer le portfolio avec PM2
