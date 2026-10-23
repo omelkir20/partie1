@@ -42,11 +42,11 @@
 ### 7.2. Créer le projet
 ![](captures/cap20.PNG)
 ![](captures/cap21.PNG)
-![](captures/cap23.PNG)
-![](captures/cap24.PNG)
-![](captures/cap25.PNG)
-![](captures/cap26.PNG)
-![](captures/cap28.PNG)
-![](captures/cap30.PNG)
+![](captures/cap23.png)
+![](captures/cap24.png)
+![](captures/cap25.png)
+![](captures/cap26.png)
+![](captures/cap28.png)
+![](captures/cap30.png)
 
 
