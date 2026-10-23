@@ -50,6 +50,3 @@
 ![](captures/cap30.PNG)
 
 
-
-
-
